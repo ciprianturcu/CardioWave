@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:async';
+import 'package:cardiowave/screens/drag_file_screeen.dart';
 import 'package:cardiowave/screens/form_page.dart';
 import 'package:cardiowave/screens/loading_page.dart';
 import 'package:flutter/material.dart';
@@ -38,12 +39,9 @@ class _SplashScreenState extends State<SplashScreen> {
       () => Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           pageBuilder: (_, __, ___) => const FormPage(),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
+          MaterialPageRoute(
+            builder: (_) => DragFileScreen(),
+          ),
         ),
       ),
     );
@@ -56,3 +54,4 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
+

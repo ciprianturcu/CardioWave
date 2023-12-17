@@ -1,6 +1,10 @@
 import 'dart:io' show File;
+import 'package:cardiowave/backend/ai_script_management.dart';
+import 'package:cardiowave/backend/file_management.dart';
+import 'package:cardiowave/screens/result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:logger/logger.dart';
 
 import '../widgets/custom_button.dart';
 
@@ -10,7 +14,18 @@ class DragFileScreen extends StatefulWidget {
 }
 
 class _DragFileScreenState extends State<DragFileScreen> {
+  FileManager fileManager = FileManager();
+  AIScript aiScript = AIScript();
+  static final _log = Logger();
   File? _selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    fileManager.createInputFolder();
+    fileManager.createOutputFolder();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -29,24 +44,24 @@ class _DragFileScreenState extends State<DragFileScreen> {
               onTap: _pickImage,
               onPanUpdate: (details) {
                 if (_selectedImage == null) {
-                  _onFilesDropped([File("fake_path")]); // Placeholder file path
+                  _onFilesDropped(File("fake_path")); // Placeholder file path
                 }
               },
               child: _selectedImage != null
                   ? _buildImageWidget()
                   : Container(
-                color: _selectedImage != null
-                    ? Colors.greenAccent
-                    : const Color(0xFFCDCDC8),
-                child: Center(
-                  child: Text(
-                      "Trage și plasează imaginea aici ...",
-                    style: TextStyle(
-                      color: Color(0xFF414040),
+                      color: _selectedImage != null
+                          ? Colors.greenAccent
+                          : const Color(0xFFCDCDC8),
+                      child: Center(
+                        child: Text(
+                          "Trage și plasează imaginea aici ...",
+                          style: TextStyle(
+                            color: Color(0xFF414040),
+                          ),
+                        ),  
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ),
           ),
           Positioned(
@@ -96,10 +111,18 @@ class _DragFileScreenState extends State<DragFileScreen> {
     );
   }
 
-  Future<void> _onFilesDropped(List<File> files) async {
+  Future<void> _onFilesDropped(File pickedFile) async {
+    await fileManager.saveInputImage(pickedFile);
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return ResultScreen();
+    }));
+
     setState(() {
-      _selectedImage = files.isNotEmpty ? files.first : null;
+      _selectedImage = pickedFile;
     });
+
+    
   }
 
   Future<void> _pickImage() async {
@@ -108,7 +131,7 @@ class _DragFileScreenState extends State<DragFileScreen> {
       allowMultiple: false,
     );
     if (result != null) {
-      _onFilesDropped([File(result.files.single.path!)]);
+      _onFilesDropped(File(result.files.single.path!));
     }
   }
 }

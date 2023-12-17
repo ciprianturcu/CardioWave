@@ -11,6 +11,11 @@ dependencies:
   flutter:
     sdk: flutter
   pdf: ^3.10.7
+  logger: ^2.0.2+1
+  path_provider: ^2.1.1
+  process_run: ^0.13.3
+  flython: ^0.2.0
+  opencv_4: ^1.0.0
 
 dev_dependencies:
   flutter_test:

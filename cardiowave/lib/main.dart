@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:async';
+import 'package:cardiowave/screens/drag_file_screeen.dart';
 import 'package:cardiowave/screens/form_page.dart';
 import 'package:cardiowave/screens/loading_page.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +15,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'My Flutter App',
-      home: SplashScreen(),
+      home: DragFileScreen(),
     );
   }
 }

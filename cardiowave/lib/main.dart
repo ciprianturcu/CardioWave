@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:cardiowave/screens/drag_file_screeen.dart';
 import 'package:cardiowave/screens/form_page.dart';
 import 'package:cardiowave/screens/loading_page.dart';
+import 'package:cardiowave/screens/result_screen.dart';
+import 'package:cardiowave/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,43 +19,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My Flutter App',
-      home: DragFileScreen(),
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
-
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-
-    Timer(
-      const Duration(seconds: 1),
-      () => Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const FormPage(),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-        ),
-      ),
+      home: SplashScreen(),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: PdfViewerPage(),
-    );
-  }
 }

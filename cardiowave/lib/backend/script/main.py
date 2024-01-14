@@ -26,7 +26,7 @@ def load_images(path):
         img = cv2.imread(img_path)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         images_list.append((img_rgb, img_name))
-
+   # print(images_list)
     return images_list
 
 
@@ -120,13 +120,13 @@ def process_image(img_rgb):
             cv2.line(img_clustered, (perpendicular_line[0], perpendicular_line[1]),
                      (perpendicular_line[2], perpendicular_line[3]), (255, 0, 0), 2)
 
-    return final_cropped_img, img_clustered, distance_cm
+    return final_cropped_img, img_clustered
 
 
-def save_image_to_output(img, image_out_path):
+def save_image_to_output(img, image_out_path, index):
     image = Image.fromarray(img)
     image = image.resize((400, 400))
-    image.save(os.path.join(image_out_path, 'cardiowave_output.jpg'))
+    image.save(os.path.join(image_out_path, f'cardiowave_output_{index}.jpg'))
 
 
 if __name__ == "__main__":
@@ -134,8 +134,13 @@ if __name__ == "__main__":
     image_output_path = sys.argv[2]
 
     images_list = load_images(image_input_path)
-
-    img_rgb, img_clustered, distance = process_image(images_list[0][0])
-
-    save_image_to_output(img_clustered, image_output_path)
+    
+    result_list = []
+    index =0 
+    
+    for image in images_list:
+        result = process_image(image[0])
+        image_to_save = result[1]
+        save_image_to_output(image_to_save, image_output_path, index)
+        index+=1
 

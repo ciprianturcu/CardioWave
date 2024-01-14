@@ -8,6 +8,7 @@ class PdfViewerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromRGBO(255, 252, 243, 1),
       body: Center(
         child: Image.asset(
           pdfImagePath,

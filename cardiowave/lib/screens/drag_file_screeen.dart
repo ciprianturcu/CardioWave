@@ -2,13 +2,9 @@ import 'dart:io' show File;
 import 'package:cardiowave/backend/ai_script_management.dart';
 import 'package:cardiowave/backend/file_management.dart';
 import 'package:cardiowave/screens/result_screen.dart';
-import 'package:cardiowave/screens/form_page.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:logger/logger.dart';
-import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../widgets/custom_button.dart';
 
@@ -22,7 +18,6 @@ class DragFileScreen extends StatefulWidget {
 class _DragFileScreenState extends State<DragFileScreen> {
   FileManager fileManager = FileManager();
   AIScript aiScript = AIScript();
-  static final _log = Logger();
   List<File?> _selectedImages = [null, null]; // Updated to hold 2 images
 
   @override
@@ -35,31 +30,35 @@ class _DragFileScreenState extends State<DragFileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFFFCF3),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AppBar(
-            backgroundColor: Colors.white,
+            automaticallyImplyLeading: false,
+            backgroundColor: Color(0xFFFFFCF3),
             elevation: 0,
-            flexibleSpace: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            flexibleSpace: Padding(
+              padding: EdgeInsets.only(left:16, right: 16, top: 16),
+              child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
                   child: const Image(
                     image: AssetImage('assets/images/logo.png'),
                     fit: BoxFit.cover,
-                    width: 50,
-                    height: 50,
+                    width: 75,
+                    height: 75,
                   ),
                 ),
-                const SizedBox(width: 16),
               ],
             ),
+            )
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
                   Expanded(
@@ -137,26 +136,12 @@ class _DragFileScreenState extends State<DragFileScreen> {
     );
   }
 
-  // Future<void> _onFilesDropped(File pickedFile, int index) async {
-  //   await fileManager.saveInputImage(pickedFile);
-  //
-  //   Navigator.push(context, MaterialPageRoute(builder: (context) {
-  //     return ResultScreen();
-  //   }));
-  //
-  //   setState(() {
-  //     _selectedImages[index] = pickedFile;
-  //   });
-  //
-  //
-  // }
-
   bool _canPressDoneButton() {
     return _selectedImages.any((image) => image != null);
   }
 
   Future<void> _onImagePicked(File pickedFile, int index) async {
-    await fileManager.saveInputImage(pickedFile);
+    await fileManager.saveInputImage(pickedFile, index);
 
     setState(() {
       _selectedImages[index] = pickedFile;
@@ -176,7 +161,7 @@ class _DragFileScreenState extends State<DragFileScreen> {
 
     for (int i = 0; i < selectedImages.length; i++) {
       if (selectedImages[i] != null) {
-        await fileManager.saveInputImage(selectedImages[i]!);
+        await fileManager.saveInputImage(selectedImages[i]!, i);
       }
     }
 
@@ -186,6 +171,8 @@ class _DragFileScreenState extends State<DragFileScreen> {
   }
 
   Future<void> _pickImages() async {
+    await fileManager.startClearOfFiles();
+    _clearImages();
     for (int i = 0; i < _selectedImages.length; i++) {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.image,

@@ -1,5 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
 
+import 'package:cardiowave/screens/drag_file_screeen.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:typed_data';
@@ -7,31 +8,53 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:file_picker/file_picker.dart';
 
 class FormPage extends StatefulWidget {
-  const FormPage({Key? key}) : super(key: key);
+  final List<String> distanceList;
+  final bool isColaps;
+
+  const FormPage({
+    Key? key,
+    required this.distanceList,
+    required this.isColaps,
+  }) : super(key: key);
 
   @override
   _FormPageState createState() => _FormPageState();
 }
 
 class _FormPageState extends State<FormPage> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _doctorNameController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
-  final TextEditingController _detectDiagnosisController = TextEditingController();
-  final TextEditingController _finalDiagnosisController = TextEditingController();
-  final TextEditingController _detectedDateController = TextEditingController();
-  final TextEditingController _doctorObservationController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _doctorNameController;
+  late TextEditingController _dateController;
+  late TextEditingController _timeController;
+  late TextEditingController _detectDiagnosisController;
+  late TextEditingController _finalDiagnosisController;
+  late TextEditingController _detectedDateController;
+  late TextEditingController _doctorObservationController;
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _doctorNameController = TextEditingController();
+    _dateController = TextEditingController();
+    _timeController = TextEditingController();
+    _detectDiagnosisController = TextEditingController(
+        text: widget.isColaps
+            ? "S-a detectat COLAPS"
+            : "Nu a fost detectat un COLAPS");
+    _finalDiagnosisController = TextEditingController();
+    _detectedDateController = TextEditingController(
+        text: 'Distante detectate: ${widget.distanceList.join(', ')}');
+    _doctorObservationController = TextEditingController();
+  }
 
   void _resetForm() {
     _nameController.clear();
     _doctorNameController.clear();
     _dateController.clear();
     _timeController.clear();
-    _detectDiagnosisController.clear();
     _finalDiagnosisController.clear();
-    _detectedDateController.clear();
     _doctorObservationController.clear();
   }
 
@@ -46,10 +69,12 @@ class _FormPageState extends State<FormPage> {
           pw.Text('Nume Doctor: ${_doctorNameController.text}\n\n'),
           pw.Text('Data Observatiei: ${_dateController.text}\n\n'),
           pw.Text('Ora Observatiei: ${_timeController.text}\n\n'),
-          pw.Text('Diagnostic Detectat: ${_detectDiagnosisController.text}\n\n'),
+          pw.Text(
+              'Diagnostic Detectat: ${_detectDiagnosisController.text}\n\n'),
           pw.Text('Diagnostic Hotarat: ${_finalDiagnosisController.text}\n\n'),
           pw.Text('Date Detectate: ${_detectedDateController.text}\n\n'),
-          pw.Text('Observatii Medicului: ${_doctorObservationController.text}\n\n'),
+          pw.Text(
+              'Observatii Medicului: ${_doctorObservationController.text}\n\n'),
         ],
       ),
     ));
@@ -71,36 +96,37 @@ class _FormPageState extends State<FormPage> {
     String hintText,
   ) {
     return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        hintText: hintText,
-        labelStyle: const TextStyle(color: Color.fromRGBO(65, 64, 64, 1)),
-        border: const OutlineInputBorder(),
-        filled: true,
-        fillColor: const Color.fromRGBO(203, 203, 201, 1),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(141, 23, 34, 1)),
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: hintText,
+          labelStyle: const TextStyle(color: Color.fromRGBO(65, 64, 64, 1)),
+          border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: const Color.fromRGBO(203, 203, 201, 1),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Color.fromRGBO(141, 23, 34, 1)),
+          ),
         ),
-      ),
-      cursorColor: const Color.fromRGBO(65, 64, 64, 1),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Acest camp nu poate fi lasat liber!';
-        }
-        return null;
-      }
-    );
+        cursorColor: const Color.fromRGBO(65, 64, 64, 1),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Acest camp nu poate fi lasat liber!';
+          }
+          return null;
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromRGBO(255, 252, 243, 1),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: Padding(
           padding: const EdgeInsets.only(top: 20),
           child: AppBar(
-            title: const Text('RAPORT GENERAT', style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1))),
+            title: const Text('RAPORT GENERAT',
+                style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1))),
             backgroundColor: const Color.fromRGBO(255, 252, 243, 1),
             elevation: 0,
             flexibleSpace: Row(
@@ -142,7 +168,9 @@ class _FormPageState extends State<FormPage> {
                           children: [
                             const Text(
                               "Nume Pacient*",
-                              style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: Color.fromRGBO(65, 64, 64, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             _buildTextFormField(
                               _nameController,
@@ -161,7 +189,9 @@ class _FormPageState extends State<FormPage> {
                           children: [
                             const Text(
                               "Nume doctor*",
-                              style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: Color.fromRGBO(65, 64, 64, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             _buildTextFormField(
                               _doctorNameController,
@@ -185,7 +215,9 @@ class _FormPageState extends State<FormPage> {
                           children: [
                             const Text(
                               "Data observatiei*",
-                              style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: Color.fromRGBO(65, 64, 64, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             _buildTextFormField(
                               _dateController,
@@ -204,7 +236,9 @@ class _FormPageState extends State<FormPage> {
                           children: [
                             const Text(
                               "Ora observatiei*",
-                              style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: Color.fromRGBO(65, 64, 64, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             _buildTextFormField(
                               _timeController,
@@ -228,7 +262,9 @@ class _FormPageState extends State<FormPage> {
                           children: [
                             const Text(
                               "Diagnostic detectat*",
-                              style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: Color.fromRGBO(65, 64, 64, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             _buildTextFormField(
                               _detectDiagnosisController,
@@ -247,7 +283,9 @@ class _FormPageState extends State<FormPage> {
                           children: [
                             const Text(
                               "Diagnostic hotarat*",
-                              style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: Color.fromRGBO(65, 64, 64, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             _buildTextFormField(
                               _finalDiagnosisController,
@@ -271,19 +309,23 @@ class _FormPageState extends State<FormPage> {
                           children: [
                             const Text(
                               "Date detectate",
-                              style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: Color.fromRGBO(65, 64, 64, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             TextFormField(
                               minLines: 1,
                               maxLines: 5,
                               controller: _detectedDateController,
                               decoration: const InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 10),
                                 border: OutlineInputBorder(),
                                 filled: true,
                                 fillColor: Color.fromRGBO(203, 203, 201, 1),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Color.fromRGBO(141, 23, 34, 1)),
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(141, 23, 34, 1)),
                                 ),
                               ),
                               cursorColor: const Color.fromRGBO(65, 64, 64, 1),
@@ -301,19 +343,23 @@ class _FormPageState extends State<FormPage> {
                           children: [
                             const Text(
                               "Observatiile medicului",
-                              style: TextStyle(color: Color.fromRGBO(65, 64, 64, 1), fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: Color.fromRGBO(65, 64, 64, 1),
+                                  fontWeight: FontWeight.bold),
                             ),
                             TextFormField(
                               minLines: 1,
                               maxLines: 5,
                               controller: _doctorObservationController,
                               decoration: const InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 10),
                                 border: OutlineInputBorder(),
                                 filled: true,
                                 fillColor: Color.fromRGBO(203, 203, 201, 1),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Color.fromRGBO(141, 23, 34, 1)),
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(141, 23, 34, 1)),
                                 ),
                               ),
                               cursorColor: const Color.fromRGBO(65, 64, 64, 1),
@@ -335,7 +381,7 @@ class _FormPageState extends State<FormPage> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        side: const BorderSide(color: Color.fromRGBO(65, 64, 64, 1)),
+                        side: const BorderSide(color: Color.fromRGBO(141, 23, 34, 1)),
                         foregroundColor: const Color.fromRGBO(203, 203, 201, 1),
                         backgroundColor: const Color.fromRGBO(255, 252, 243, 1),
                         padding: const EdgeInsets.all(16.0),
@@ -343,7 +389,9 @@ class _FormPageState extends State<FormPage> {
                       ),
                       child: const Text(
                         'SALVEAZA RAPORT',
-                        style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(65, 64, 64, 1)),
+                        style: TextStyle(
+                            fontSize: 14.0,
+                            color: Color.fromRGBO(65, 64, 64, 1)),
                       ),
                     ),
                     ElevatedButton(
@@ -351,7 +399,7 @@ class _FormPageState extends State<FormPage> {
                         _resetForm();
                       },
                       style: ElevatedButton.styleFrom(
-                        side: const BorderSide(color: Color.fromRGBO(65, 64, 64, 1)),
+                        side: const BorderSide(color: Color.fromRGBO(141, 23, 34, 1)),
                         foregroundColor: const Color.fromRGBO(203, 203, 201, 1),
                         backgroundColor: const Color.fromRGBO(255, 252, 243, 1),
                         padding: const EdgeInsets.all(16.0),
@@ -359,7 +407,31 @@ class _FormPageState extends State<FormPage> {
                       ),
                       child: const Text(
                         'ANULEAZA RAPORT',
-                        style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(65, 64, 64, 1)),
+                        style: TextStyle(
+                            fontSize: 14.0,
+                            color: Color.fromRGBO(65, 64, 64, 1)),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return DragFileScreen();
+                        }));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        side: const BorderSide(
+                            color: Color.fromRGBO(141, 23, 34, 1)),
+                        foregroundColor: const Color.fromRGBO(203, 203, 201, 1),
+                        backgroundColor: const Color.fromRGBO(255, 252, 243, 1),
+                        padding: const EdgeInsets.all(16.0),
+                        fixedSize: const Size(280, 40),
+                      ),
+                      child: const Text(
+                        'DIAGNOSTICHEAZA ALTE IMAGINI',
+                        style: TextStyle(
+                            fontSize: 14.0,
+                            color: Color.fromRGBO(65, 64, 64, 1)),
                       ),
                     ),
                   ],

@@ -5,12 +5,9 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileManager {
-  File? file;
   static final _log = Logger();
   static String _inputFolderPath = "";
   static String _outputFolderPath = "";
-  Timer? _timer;
-  int _start = 30;
 
   String getInputFolderPath() {
     return _inputFolderPath;
@@ -18,10 +15,6 @@ class FileManager {
 
   String getOutputFolderPath() {
     return _outputFolderPath;
-  }
-
-  File? getFile() {
-    return file;
   }
 
   Future<void> createOutputFolder() async {
@@ -42,6 +35,11 @@ class FileManager {
     _inputFolderPath = inputFolder.path;
     _log.i('Succesfully created input folder');
   }
+  
+  Future<void> startClearOfFiles() async {
+    final directory = await getTemporaryDirectory();
+    await clearIOFiles("${directory.path}\\cardiowave");
+  }
 
   Future<void> clearIOFiles(String path) async {
     _log.d('Entered clear of input/output temporary locations.');
@@ -59,41 +57,32 @@ class FileManager {
     }
   }
 
-  Future<void> saveInputImage(File inputFile) async {
+  Future<void> saveInputImage(File inputFile, int index) async {
     _log.d('Entered input image saving.');
-    final fileName = 'cardiowave_input.jpg';
+    final fileName = 'cardiowave_input_$index.jpg';
     final newFilePathToBeSaved =
         await File('${_inputFolderPath}/$fileName').create();
     await inputFile.copy(newFilePathToBeSaved.path);
     _log.i('Successfully saved input image.');
   }
 
-  Future<void> retrieveImage() async {
-    final imagePath =
-        '${_outputFolderPath}\\cardiowave_output.jpg';
-    final imageFile = File(imagePath);
+  Future<List<File>> retrieveImages() async {
+    final directory = Directory(_outputFolderPath);
+    final files = await directory.list().toList();
 
-    if (await imageFile.existsSync()) {
-        _log.d('found it....${imageFile.path}');
-        file = imageFile;
-        _timer?.cancel();
-    }
-  }
+    List<File> matchingFiles = [];
 
-  void startTimer() {
-    const oneSec = const Duration(seconds: 1);
-    _timer = new Timer.periodic(
-      oneSec,
-      (Timer timer) async {
-        if (_start == 0) {
-          timer.cancel();
-        } else {
-          await retrieveImage();
-          _log.d(_start);
-          _start--;
+    for (var entity in files) {
+      //print(entity);
+      if (entity is File && entity.path.endsWith('.jpg')) {
+        //print("is File and ends with jpg");
+        String filename = entity.path.split('\\').last;
+        if (filename.startsWith('cardiowave_output_')) {
+          matchingFiles.add(entity);
         }
-      },
-    );
-    _log.d('finished timer');
+      }
+    }
+    //print(matchingFiles.length);
+    return matchingFiles;
   }
 }
